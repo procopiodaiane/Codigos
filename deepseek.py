@@ -10,10 +10,10 @@ from pdf2image import convert_from_path
 sys.stdout.reconfigure(encoding='utf-8')
 
 # === CONFIGURAÇÕES ===
-diretorio = r"C:\Users\proco\OneDrive\Área de Trabalho\Qualificação\Teses\1_CienciasExataseDaTerra"
-saida_csv = r"C:\Users\proco\OneDrive\Área de Trabalho\Qualificação\Codigos\Respostas\respostas_deepseek.csv"
-poppler_path = r"C:\poppler\Library\bin"
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+diretorio = r"C:\\Users\\proco\\OneDrive\\Área de Trabalho\\Qualificação\\Teses\\1_CienciasExataseDaTerra"
+saida_csv = r"C:\\Users\\proco\\OneDrive\\Área de Trabalho\\Qualificação\\Codigos\\Respostas\\respostas_deepseek.csv"
+poppler_path = r"C:\\poppler\\Library\\bin"
+pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 modelo_ollama = "deepseek-r1"
 
 # === EXTRAÇÃO DE TEXTO COM OCR ===
@@ -56,15 +56,14 @@ def extrair_texto(pdf_path):
 # === MONTA O PROMPT PARA OLLAMA ===
 def montar_prompt(texto):
     return (
-        "Você é um assistente especializado em análise de teses acadêmicas. "
-        "Com base no texto abaixo, responda às 5 perguntas separadas por ' ||| ':\n\n"
+        "Com base no texto da tese abaixo, responda diretamente (sem explicações) separando as respostas com ' ||| ' :\n"
         "1. Qual é o título da tese e o nome do autor(a)?\n"
         "2. Resuma o conteúdo principal da tese em até 3 frases.\n"
         "3. Qual é o objetivo principal desta tese?\n"
         "4. Descreva brevemente a metodologia aplicada na tese.\n"
         "5. Quais são as principais conclusões ou resultados apresentados na tese?\n\n"
-        f"TEXTO:\n{texto[:6000]}\n\n"
-        "Formato da resposta:\nResposta 1 ||| Resposta 2 ||| Resposta 3 ||| Resposta 4 ||| Resposta 5"
+        f"TEXTO DA TESE:\n{texto[:6000]}\n\n"
+        "Formato da resposta: Resposta 1 ||| Resposta 2 ||| Resposta 3 ||| Resposta 4 ||| Resposta 5"
     )
 
 # === ENVIA AO OLLAMA COM TRATAMENTO DE ERROS ===
@@ -76,7 +75,11 @@ def chamar_ollama(prompt):
         )
         dados = resposta.json()
         if "response" in dados:
-            return dados["response"].strip()
+            bruto = dados["response"].strip()
+            # Limpa linhas com "<think>" ou instruções internas
+            linhas = bruto.splitlines()
+            limpas = [l for l in linhas if not l.strip().startswith("<")]
+            return " ".join(limpas).strip()
         else:
             print("[ERRO] Resposta inesperada do modelo:", dados)
             return "Não foi possível gerar resposta"
@@ -84,26 +87,14 @@ def chamar_ollama(prompt):
         print(f"[ERRO] Falha na chamada ao Ollama: {e}")
         return "Erro na chamada ao modelo"
 
-# === CHECKPOINT ===
-if os.path.exists(saida_csv):
-    df_existente = pd.read_csv(saida_csv)
-    arquivos_processados = set(df_existente["Arquivo"].tolist())
-    print(f"[CHECKPOINT] Retomando. Já processados: {len(arquivos_processados)} arquivos.")
-    resultados = df_existente.to_dict(orient="records")
-else:
-    arquivos_processados = set()
-    resultados = []
-
-# === PROCESSAMENTO ===
+# === PROCESSAMENTO COMPLETO ===
+resultados = []
 todos_arquivos = [f for f in os.listdir(diretorio) if f.lower().endswith(".pdf")]
 total = len(todos_arquivos)
 contador = 0
 
 for arquivo in todos_arquivos:
     contador += 1
-    if arquivo in arquivos_processados:
-        continue
-
     print(f"\n[{contador}/{total}] Processando: {arquivo}")
     caminho_pdf = os.path.join(diretorio, arquivo)
     texto = extrair_texto(caminho_pdf)
@@ -127,8 +118,7 @@ for arquivo in todos_arquivos:
 
     resultados.append(dados)
     pd.DataFrame(resultados).to_csv(saida_csv, index=False, encoding="utf-8-sig")
-    print(f"[✔️] '{arquivo}' processado.")
+    print(f"[✔] '{arquivo}' processado.")
 
-print(f"\n[FIM] Total de arquivos processados: {len(resultados)}")
-print(f"[PASTA] Resultados salvos em: {saida_csv}")
-
+print(f"\n[✅ FIM] Total de arquivos processados: {len(resultados)}")
+print(f"[📁] Resultados salvos em: {saida_csv}")
