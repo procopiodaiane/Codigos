@@ -1,3 +1,4 @@
+# Bibliotecas
 import os
 import fitz  # PyMuPDF
 import pytesseract
@@ -13,13 +14,13 @@ pasta_resultados = r"C:\\Users\\proco\\OneDrive\\Área de Trabalho\\Qualificaç�
 # Modelo Ollama
 modelo_ollama = "llama3.2"
 
-# Perguntas e mapeamento de páginas - Os modelos não rodam todas as páginas por limitação de tokens.
+# Perguntas e mapeamento de páginas - Os modelos não rodam todas as páginas por limitação de tokens, então foi necessário indicar páginas para a pesquisa das respostas.
 perguntas = [
-    "1. Título da tese e nome do autor(a):",
-    "2. Resumo da tese em até 3 frases:",
-    "3. Objetivo principal:",
-    "4. Metodologia aplicada:",
-    "5. Principais conclusões ou resultados:"
+    "1. Qual é o título da tese e o nome do autor(a)?",
+    "2. Resuma o conteúdo principal da tese em até 3 frases.",
+    "3. Qual é o objetivo principal desta tese?",
+    "4. Descreva brevemente a metodologia aplicada na tese.",
+    "5. Quais são as principais conclusões ou resultados apresentados na tese?"
 ]
 
 mapeamento_paginas = [
@@ -137,7 +138,7 @@ Responda com frases curtas e diretas, evitando justificativas ou frases introdut
 
 # Salva resultados
 df = pd.DataFrame(resultados)
-caminho_csv = os.path.join(pasta_resultados, "respostas_llama32.csv")
+caminho_csv = os.path.join(pasta_resultados, "respostas_llama.csv")
 df.to_csv(caminho_csv, index=False, encoding="utf-8-sig")
 print(f"\n\ud83d\ude80 Resultados salvos em: {caminho_csv}")
 
