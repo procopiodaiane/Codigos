@@ -154,6 +154,6 @@ A seguir está o conteúdo de uma tese. Leia atentamente e responda apenas com a
 
 # Salva resultados
 df = pd.DataFrame(resultados)
-caminho_csv = os.path.join(pasta_resultados, "respostas_mistral_refinado.csv")
+caminho_csv = os.path.join(pasta_resultados, "respostas_mistral.csv")
 df.to_csv(caminho_csv, index=False, encoding="utf-8-sig")
 print(f"\n Resultados salvos em: {caminho_csv}")
