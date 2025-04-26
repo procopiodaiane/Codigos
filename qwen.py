@@ -1,4 +1,3 @@
-# Bibliotecas
 import os
 import fitz  # PyMuPDF
 import pytesseract
@@ -28,10 +27,10 @@ mapeamento_paginas = [
     list(range(5, 20)),
     list(range(8, 28)),
     list(range(10, 30)),
-    "ultimas_40"
+    "ultimas_50"
 ]
 
-# Função para aplicar OCR ao PDF por página
+# OCR por página
 def extrair_texto_paginas(pdf_path):
     imagens = convert_from_path(pdf_path)
     textos = []
@@ -40,7 +39,7 @@ def extrair_texto_paginas(pdf_path):
         textos.append(texto)
     return textos
 
-# Função para chamada ao Ollama
+# Chamada ao modelo
 def chamar_ollama(modelo, prompt):
     try:
         resposta = ollama.chat(model=modelo, messages=[{"role": "user", "content": prompt}])
@@ -48,7 +47,7 @@ def chamar_ollama(modelo, prompt):
     except Exception as e:
         return f"[ERRO OLLAMA] {str(e)}"
 
-# Função para limpar resposta
+# Limpeza de resposta
 def limpar_resposta(texto):
     if pd.isna(texto):
         return texto
@@ -57,10 +56,6 @@ def limpar_resposta(texto):
         return "Texto com ruído OCR - não interpretado."
     if re.fullmatch(r"\d{1,2}", texto):
         return "Texto com ruído OCR - não interpretado."
-
-    texto = re.sub(r"(?i)^(okay|primeiro|vou tentar|preciso|então|bem|let me).*?(\.|\n)", '', texto)
-    texto = re.sub(r"<think>.*?(?=\n|$)", "", texto, flags=re.IGNORECASE | re.DOTALL)
-    texto = re.sub(r'^.*?(resposta|answer):\s*', '', texto, flags=re.IGNORECASE)
 
     padroes = [
         r'^O título.*?:\s*', r'^Aqui está.*?:\s*', r'^A metodologia.*?:\s*',
@@ -87,11 +82,10 @@ def limpar_resposta(texto):
 
     return texto.strip()
 
-# Inicializa resultados
+# Processamento dos arquivos
 resultados = []
-
-# Processa os arquivos PDF
 arquivos = [arq for arq in os.listdir(pasta_teses) if arq.endswith(".pdf")]
+
 for i, arquivo in enumerate(arquivos, 1):
     print(f"[{i}/{len(arquivos)}] Processando: {arquivo}")
     caminho_pdf = os.path.join(pasta_teses, arquivo)
@@ -107,19 +101,26 @@ for i, arquivo in enumerate(arquivos, 1):
 
     for idx, pergunta in enumerate(perguntas):
         paginas = mapeamento_paginas[idx]
-        if paginas == "ultimas_40":
-            paginas = list(range(max(0, total_paginas - 40), total_paginas))
 
-        texto_segmento = "\n".join([texto_paginas[p] for p in paginas if p < total_paginas])
+        if isinstance(paginas, str) and paginas.startswith("ultimas_"):
+            try:
+                num = int(paginas.replace("ultimas_", ""))
+                paginas = list(range(max(0, total_paginas - num), total_paginas))
+            except ValueError:
+                paginas = []
+
+        texto_segmento = "\n".join([texto_paginas[p] for p in paginas if isinstance(p, int) and p < total_paginas])
 
         if not texto_segmento.strip():
             respostas.append("Texto não encontrado nas páginas indicadas.")
             continue
 
         prompt = f"""
-A seguir está o conteúdo de uma tese. Leia atentamente e responda apenas com a informação solicitada. NÃO explique seu raciocínio. NÃO comente se parece ou provavelmente. Responda apenas em português, com frases objetivas e diretas:
+A seguir está o conteúdo de uma tese. Leia atentamente e responda com objetividade e sem explicações. Não repita a pergunta. Responda apenas em português.
 
 {texto_segmento}
+
+Responda com frases curtas e diretas, evitando justificativas ou frases introdutórias. Evite dizer que não há conteúdo se houver informação parcial. Responda somente com a informação solicitada:
 
 {pergunta}
 """.strip()
@@ -138,8 +139,8 @@ A seguir está o conteúdo de uma tese. Leia atentamente e responda apenas com a
     }
     resultados.append(dados)
 
-# Salva resultados
+# Exporta resultados
 df = pd.DataFrame(resultados)
-caminho_csv = os.path.join(pasta_resultados, "respostas_qwen50.csv")
+caminho_csv = os.path.join(pasta_resultados, "respostas_qwen.csv")
 df.to_csv(caminho_csv, index=False, encoding="utf-8-sig")
-print(f"\n Resultados salvos em: {caminho_csv}")
+print(f"\n\ud83d\ude80 Resultados salvos em: {caminho_csv}")

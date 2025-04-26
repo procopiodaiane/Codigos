@@ -28,7 +28,7 @@ mapeamento_paginas = [
     list(range(5, 20)),
     list(range(8, 28)),
     list(range(10, 30)),
-    "ultimas_40"
+    "ultimas_50"
 ]
 
 # Função para aplicar OCR ao PDF por página
@@ -114,14 +114,18 @@ for i, arquivo in enumerate(arquivos, 1):
 
     for idx, pergunta in enumerate(perguntas):
         paginas = mapeamento_paginas[idx]
-        if paginas == "ultimas_40":
-            paginas = list(range(max(0, total_paginas - 40), total_paginas))
 
-        texto_segmento = "\n".join([texto_paginas[p] for p in paginas if p < total_paginas])
+        if isinstance(paginas, str) and paginas.startswith("ultimas_"):
+            try:
+                num = int(paginas.replace("ultimas_", ""))
+                paginas = list(range(max(0, total_paginas - num), total_paginas))
+            except ValueError:
+                paginas = []
+
+        texto_segmento = "\n".join([texto_paginas[p] for p in paginas if isinstance(p, int) and p < total_paginas])
 
         if not texto_segmento.strip():
             respostas.append("Texto não encontrado nas páginas indicadas.")
-            classificacoes.append("Comentário")
             continue
 
         prompt = f"""
