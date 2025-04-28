@@ -148,11 +148,6 @@ A seguir está o conteúdo de uma tese. Leia atentamente e responda apenas com a
         "Objetivo": respostas[2] if len(respostas) > 2 else "",
         "Metodologia": respostas[3] if len(respostas) > 3 else "",
         "Conclusões": respostas[4] if len(respostas) > 4 else "",
-        "Classificação Título e Autor": classificacoes[0] if len(classificacoes) > 0 else "",
-        "Classificação Resumo": classificacoes[1] if len(classificacoes) > 1 else "",
-        "Classificação Objetivo": classificacoes[2] if len(classificacoes) > 2 else "",
-        "Classificação Metodologia": classificacoes[3] if len(classificacoes) > 3 else "",
-        "Classificação Conclusões": classificacoes[4] if len(classificacoes) > 4 else ""
     }
     resultados.append(dados)
 
