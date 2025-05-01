@@ -1,3 +1,6 @@
+# Modelo
+modelo_ollama = "mistral"
+
 # Bibliotecas
 import os
 import fitz  # PyMuPDF
@@ -10,9 +13,6 @@ import re
 # Diretórios
 pasta_teses = r"C:\\Users\\proco\\OneDrive\\Área de Trabalho\\Qualificação\\Teses\\1_CienciasExataseDaTerra"
 pasta_resultados = r"C:\\Users\\proco\\OneDrive\\Área de Trabalho\\Qualificação\\Codigos\\Respostas"
-
-# Modelo Ollama
-modelo_ollama = "mistral"
 
 # Perguntas e mapeamento de páginas
 perguntas = [
@@ -48,20 +48,15 @@ def chamar_ollama(modelo, prompt):
     except Exception as e:
         return f"[ERRO OLLAMA] {str(e)}"
 
-# Função para limpar e classificar respostas
+# Função para limpar respostas
 def limpar_resposta(texto):
     if pd.isna(texto):
-        return texto, "Comentário"
+        return texto
     texto = str(texto).strip()
     if texto.upper().startswith("AAA") or re.fullmatch(r"[A-Z ]{5,}", texto):
-        return "Texto com ruído OCR - não interpretado.", "Comentário"
+        return "Texto com ruído OCR - não interpretado."
     if re.fullmatch(r"\d{1,2}", texto):
-        return "Texto com ruído OCR - não interpretado.", "Comentário"
-
-    # Remoção de frases de raciocínio e marcação
-    classificacao = "Resposta Válida"
-    if any(palavra in texto.lower() for palavra in ["parece", "aparentemente", "provavelmente", "pode ser"]):
-        classificacao = "Comentário"
+        return "Texto com ruído OCR - não interpretado."
 
     texto = re.sub(r"(?i)^(okay|primeiro|vou tentar|preciso|então|bem|let me).*?(\.|\n)", '', texto)
     texto = re.sub(r"<think>.*?(?=\n|$)", "", texto, flags=re.IGNORECASE | re.DOTALL)
@@ -89,9 +84,8 @@ def limpar_resposta(texto):
 
     if "não apresenta" in texto.lower() and len(texto.split()) < 10:
         texto = "Conteúdo não identificado claramente no trecho analisado."
-        classificacao = "Comentário"
 
-    return texto.strip(), classificacao
+    return texto.strip()
 
 # Inicializa resultados
 resultados = []
@@ -110,7 +104,6 @@ for i, arquivo in enumerate(arquivos, 1):
 
     total_paginas = len(texto_paginas)
     respostas = []
-    classificacoes = []
 
     for idx, pergunta in enumerate(perguntas):
         paginas = mapeamento_paginas[idx]
@@ -129,7 +122,7 @@ for i, arquivo in enumerate(arquivos, 1):
             continue
 
         prompt = f"""
-A seguir está o conteúdo de uma tese. Leia atentamente e responda apenas com a informação solicitada. NÃO explique seu raciocínio. NÃO comente se parece ou provavelmente. Responda apenas em português, com frases objetivas e diretas:
+A seguir está o conteúdo de uma tese. Leia atentamente e responda somente com as informações solicitadas. Responda em português, com frases diretas e completas, separando o título da tese e o nome do autor(a). Não repita a pergunta, não inclua comentários, apenas a resposta objetiva:
 
 {texto_segmento}
 
@@ -137,9 +130,8 @@ A seguir está o conteúdo de uma tese. Leia atentamente e responda apenas com a
 """.strip()
 
         resposta = chamar_ollama(modelo_ollama, prompt)
-        resposta_limpa, classificacao = limpar_resposta(resposta)
+        resposta_limpa = limpar_resposta(resposta)
         respostas.append(resposta_limpa)
-        classificacoes.append(classificacao)
 
     dados = {
         "Arquivo": arquivo,
@@ -153,6 +145,4 @@ A seguir está o conteúdo de uma tese. Leia atentamente e responda apenas com a
 
 # Salva resultados
 df = pd.DataFrame(resultados)
-caminho_csv = os.path.join(pasta_resultados, "respostas_mistral.csv")
-df.to_csv(caminho_csv, index=False, encoding="utf-8-sig")
-print(f"\n Resultados salvos em: {caminho_csv}")
+df.to_csv(os.path.join(pasta_resultados, "respostas_mistral.csv"), index=False, encoding="utf-8-sig")
