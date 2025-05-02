@@ -1,1 +1,1 @@
-Códigos utilizados para o desenvolvimento da pesquisa de dissertação Large Language Moels para recuperação da informação em digitalizações.
+Códigos utilizados para o desenvolvimento da pesquisa de dissertação <strong>Large Language Models para recuperação da informação em digitalizações</strong>.
