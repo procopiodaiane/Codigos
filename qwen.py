@@ -11,8 +11,8 @@ import ollama
 import re
 
 # Diretórios
-pasta_teses = r"C:\\Users\\proco\\OneDrive\\Área de Trabalho\\Qualificação\\Teses\\1_CienciasExataseDaTerra"
-pasta_resultados = r"C:\\Users\\proco\\OneDrive\\Área de Trabalho\\Qualificação\\Codigos\\Respostas"
+pasta_teses = r"C:\\Users\\proco\\OneDrive\\Área de Trabalho\\Dissertação\\Teses\\1_CienciasExataseDaTerra"
+pasta_resultados = r"C:\\Users\\proco\\OneDrive\\Área de Trabalho\\Dissertação\\Respostas"
 
 # Perguntas e mapeamento de páginas
 perguntas = [
