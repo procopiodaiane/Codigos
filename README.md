@@ -1,6 +1,6 @@
 # Large Language Models para Recuperação da Informação em Acervos Históricos Digitalizados
 
-Este repositório contém os **códigos utilizados** na pesquisa de dissertação intitulada **Large Language Models para recuperação da informação em Acervos Históricos Digitalizados**, desenvolvida por **Daiane Campos Procópio**, no âmbito do Programa de Pós-Graduação em Gestão e Organização do Conhecimento da Escola de Ciência da Informação da UFMG.
+Este repositório contém os **códigos utilizados** na pesquisa de dissertação intitulada **Large Language Models para recuperação da informação em acervos históricos digitalizados**, desenvolvida por **Daiane Campos Procópio**, no âmbito do Programa de Pós-Graduação em Gestão e Organização do Conhecimento da Escola de Ciência da Informação da UFMG.
 
 A pesquisa investigou o uso de Large Language Models (LLMs) para identificar e recuperar informações de teses digitalizadas, incluindo documentos que não possuem o texto reconhecível por máquina.
 
