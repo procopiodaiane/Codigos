@@ -1,8 +1,8 @@
 # Large Language Models para Recuperação da Informação em Acervos Históricos Digitalizados
 
-Este repositório contém os **códigos utilizados na pesquisa de dissertação** intitulada **“Large Language Models para recuperação da informação em Acervos Históricos Digitalizados”**, desenvolvida por **Daiane Campos Procópio** no âmbito do **Programa de Pós-Graduação em Gestão e Organização do Conhecimento da Escola de Ciência da Informação da UFMG**.
+Este repositório contém os **códigos utilizados** na pesquisa de dissertação intitulada **Large Language Models para recuperação da informação em Acervos Históricos Digitalizados**, desenvolvida por **Daiane Campos Procópio**, no âmbito do Programa de Pós-Graduação em Gestão e Organização do Conhecimento da Escola de Ciência da Informação da UFMG.
 
-A pesquisa investigou o uso de **Large Language Models (LLMs)** para identificar e recuperar informações de teses digitalizadas, incluindo documentos que não possuem o texto reconhecível por máquina.
+A pesquisa investigou o uso de Large Language Models (LLMs) para identificar e recuperar informações de teses digitalizadas, incluindo documentos que não possuem o texto reconhecível por máquina.
 
 ---
 
@@ -12,7 +12,7 @@ O código principal realiza as seguintes etapas:
 
 1. **Leitura e pré-processamento dos arquivos PDF**
    - Conversão de páginas do PDF em imagem com `pdf2image`.
-   - Aplicação de OCR com `pytesseract` para extrair o texto das imagens.
+   - Aplicação de Reconhecimento Óptico de Caracteres (OCR) com `pytesseract` para extrair o texto das imagens.
 
 2. **Perguntas sobre o conteúdo dos documentos**
    - Cinco perguntas são feitas sobre cada tese, abordando título, autor, resumo, objetivo, metodologia e conclusões.
@@ -46,18 +46,12 @@ O código principal realiza as seguintes etapas:
 
 Instale as dependências:
 
-*pip install pymupdf pytesseract pdf2image pandas ollama*
+   *pip install pymupdf pytesseract pdf2image pandas ollama*
 
 Certifique-se de que o Tesseract OCR esteja instalado e configurado no PATH do sistema.
 
 Ajuste os caminhos das pastas conforme sua estrutura local.
 
-Execute o script:
-
-*python extracao_llm.py*
+Execute o script.
 
 Verifique o arquivo .csv gerado no diretório de resultados.
-
-## 🧾 Licença
-
-Este projeto é distribuído sob a Licença MIT, permitindo uso acadêmico e não comercial, desde que citada a fonte original da pesquisa.
